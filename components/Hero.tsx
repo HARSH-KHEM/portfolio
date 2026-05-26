@@ -25,7 +25,7 @@ const TEXT_MUTED = '#7e5baa'
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
 /* ------------------------------------------------------------------ */
-const TOTAL_FRAMES = 192
+const TOTAL_FRAMES = 96
 
 interface MomentData {
   label: string
@@ -352,17 +352,17 @@ export default function Hero() {
     const loadFrame = (i: number): Promise<void> =>
       new Promise((resolve) => {
         const img = new Image()
-        img.src = `/frames/frame_${String(i).padStart(4, '0')}.png`
+        img.src = `/frames/frame_${String(i).padStart(4, '0')}.jpg`
         img.onload = () => { framesRef.current[i - 1] = img; resolve() }
         img.onerror = () => resolve()
       })
 
     const init = async () => {
-      const first30 = Array.from({ length: 30 }, (_, i) => loadFrame(i + 1))
-      await Promise.all(first30)
+      const first15 = Array.from({ length: 15 }, (_, i) => loadFrame(i + 1))
+      await Promise.all(first15)
       resizeCanvases()
       setLoaded(true)
-      for (let i = 31; i <= TOTAL_FRAMES; i++) loadFrame(i)
+      for (let i = 16; i <= TOTAL_FRAMES; i++) loadFrame(i)
     }
 
     init()
