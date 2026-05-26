@@ -212,8 +212,8 @@ export default function Hero() {
     window.addEventListener('resize', handler)
     return () => window.removeEventListener('resize', handler)
   }, [])
-  const isMobile = mounted && windowWidth < 640
-  const isTablet = mounted && windowWidth >= 640 && windowWidth < 1024
+  const isMobile = mounted && windowWidth < 768
+  const isTablet = mounted && windowWidth >= 768 && windowWidth < 1024
 
   /* ---- Build heatmap days from raw calendar string ---- */
   const buildHeatmapDays = (calendarRaw: string) => {
@@ -472,10 +472,10 @@ export default function Hero() {
   /* ---- Position map ---- */
   const posClass: Record<string, string> = isMobile
     ? {
-        'top-left': 'bottom-20 left-4 right-4 text-center items-center',
-        'top-right': 'bottom-20 left-4 right-4 text-center items-center',
-        'bottom-left': 'bottom-20 left-4 right-4 text-center items-center',
-        'bottom-right': 'bottom-20 left-4 right-4 text-center items-center',
+        'top-left': 'top-20 left-4 right-4 text-left',
+        'top-right': 'top-20 left-4 right-4 text-left',
+        'bottom-left': 'top-20 left-4 right-4 text-left',
+        'bottom-right': 'top-20 left-4 right-4 text-left',
       }
     : isTablet
     ? {
@@ -498,13 +498,15 @@ export default function Hero() {
 
   /* LeetCode card shared base styles */
   const lcCardBase = {
-    background: 'rgba(10,10,10,0.6)',
+    background: isMobile ? 'rgba(15,10,30,0.85)' : 'rgba(10,10,10,0.6)',
     border: '0.5px solid rgba(192,132,252,0.12)',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
     borderRadius: 4,
     padding: 32,
-    boxShadow: '0 0 40px rgba(192,132,252,0.08), 0 0 80px rgba(192,132,252,0.04), inset 0 0 40px rgba(0,0,0,0.4)',
+    boxShadow: isMobile
+      ? '0 0 40px rgba(192,132,252,0.08), 0 0 80px rgba(192,132,252,0.04)'
+      : '0 0 40px rgba(192,132,252,0.08), 0 0 80px rgba(192,132,252,0.04), inset 0 0 40px rgba(0,0,0,0.4)',
     position: 'relative' as const,
     overflow: 'hidden' as const,
     minHeight: 420,
@@ -697,8 +699,7 @@ export default function Hero() {
                 className="w-10 h-px mt-4"
                 style={{
                   background: `linear-gradient(90deg, ${ACCENT_PRIMARY}, ${ACCENT_SECONDARY})`,
-                  marginLeft: isMobile ? 'auto' : moment.position.includes('right') ? 'auto' : 0,
-                  marginRight: isMobile ? 'auto' : undefined,
+                  marginLeft: isMobile ? 0 : moment.position.includes('right') ? 'auto' : 0,
                 }}
                 initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
                 transition={{ delay: 0.3, duration: 0.4 }}
@@ -880,6 +881,7 @@ export default function Hero() {
           {showSkills && (
             <motion.div
               className="fixed inset-0 z-[25] flex items-center justify-center"
+              style={{ padding: isMobile ? '0 16px' : undefined }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -900,9 +902,8 @@ export default function Hero() {
                 {/* Icon rows */}
                 <div className="flex flex-col items-center" style={{ gap: isMobile ? 8 : isTablet ? 12 : 24 }}>
                   {SKILL_ROWS.map((row, rowIdx) => {
-                    if (isMobile && rowIdx === 2) return null
                     return (
-                    <div key={rowIdx} className="flex justify-center" style={{ gap: isMobile ? 8 : isTablet ? 12 : 24 }}>
+                    <div key={rowIdx} className="flex justify-center" style={{ gap: isMobile ? 8 : isTablet ? 12 : 24, flexWrap: isMobile ? 'wrap' : undefined }}>
                       {row.map((skill) => {
                         const flatI = skillFlatIdx++
                         return (
@@ -955,7 +956,7 @@ export default function Hero() {
                             </div>
                             <span
                               className="skill-label tracking-widest uppercase text-center mt-2"
-                              style={{ color: TEXT_MUTED, transition: 'color 0.3s', fontSize: isMobile ? 7 : 9 }}
+                              style={{ color: TEXT_MUTED, transition: 'color 0.3s', fontSize: 9, ...(isMobile ? { padding: '4px 10px' } : {}) }}
 
                             >
                               {skill.name}
@@ -994,7 +995,7 @@ export default function Hero() {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 16,
-                  width: isMobile ? '90vw' : 'min(600px, 85vw)',
+                  width: isMobile ? 'calc(100vw - 48px)' : 'min(600px, 85vw)',
                   zIndex: 30,
                   pointerEvents: 'auto',
                 }}
@@ -1097,9 +1098,9 @@ export default function Hero() {
                   </p>
 
                   {/* Month labels row */}
-                  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 26 : 53}, 1fr)`, gap: isMobile ? 2 : 3, marginBottom: 4 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 26 : 53}, 1fr)`, gap: isMobile ? 1 : 3, marginBottom: 4 }}>
                     {Array.from({ length: isMobile ? 26 : 53 }, (_, col) => {
-                      const actualCol = isMobile ? col + 27 : col
+                      const actualCol = isMobile ? col : col
                       const match = heatmapMonths.find(m => m.col === actualCol)
                       return (
                         <div key={col} style={{ fontSize: 7, color: '#3a1d5c', letterSpacing: '0.05em', lineHeight: '10px' }}>
@@ -1110,34 +1111,50 @@ export default function Hero() {
                   </div>
 
                   {/* Heatmap grid: 53 cols × 7 rows */}
-                  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${isMobile ? 26 : 53}, 1fr)`, gridAutoRows: 'auto', gap: isMobile ? 2 : 3, width: '100%' }}>
-                    {/* CSS grid fills column-first, but we need col-major order:
-                        col0row0, col1row0, ... col52row0, col0row1, ... */}
-                    {Array.from({ length: 7 }, (_, row) =>
-                      Array.from({ length: isMobile ? 26 : 53 }, (_, col) => {
-                        const actualCol = isMobile ? col + 27 : col
-                        const val = heatmapDays[actualCol * 7 + row] ?? 0
-                        let bg = '#111111'
-                        let border = '1px solid #1a1a1a'
-                        let shadow = 'none'
-                        if (val >= 1 && val <= 2) { bg = '#3b0764'; border = 'none' }
-                        else if (val >= 3 && val <= 5) { bg = ACCENT_DIM; border = 'none'; shadow = '0 0 4px rgba(124,58,237,0.6)' }
-                        else if (val >= 6 && val <= 9) { bg = ACCENT_PRIMARY; border = 'none'; shadow = '0 0 6px rgba(192,132,252,0.7)' }
-                        else if (val >= 10) { bg = ACCENT_SECONDARY; border = 'none'; shadow = '0 0 8px rgba(244,114,182,0.8)' }
-                        return (
-                          <div
-                            key={`${col}-${row}`}
-                            style={{
-                              aspectRatio: '1',
-                              borderRadius: 2,
-                              background: bg,
-                              border: val === 0 ? border : 'none',
-                              boxShadow: shadow,
-                            }}
-                          />
-                        )
-                      })
-                    ).flat()}
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                    overflowX: 'auto',
+                    WebkitOverflowScrolling: 'touch',
+                    minHeight: '80px',
+                  }}>
+                    {Array.from({ length: 7 }, (_, row) => {
+                      const getSquareColor = (value: number) => {
+                        if (value === 0) return '#3b1f6e'
+                        if (value <= 2) return '#7c3aed'
+                        if (value <= 4) return '#a855f7'
+                        return '#e879f9'
+                      }
+                      return (
+                        <div
+                          key={row}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            gap: '2px',
+                          }}
+                        >
+                          {Array.from({ length: isMobile ? 26 : 53 }, (_, col) => {
+                            const actualCol = isMobile ? col : col
+                            const val = heatmapDays[actualCol * 7 + row] ?? 0
+                            return (
+                              <div
+                                key={`${col}-${row}`}
+                                style={{
+                                  width: '8px',
+                                  height: '8px',
+                                  borderRadius: '2px',
+                                  backgroundColor: getSquareColor(val),
+                                  flexShrink: 0,
+                                  opacity: 1,
+                                }}
+                              />
+                            )
+                          })}
+                        </div>
+                      )
+                    })}
                   </div>
 
                   {/* Footer */}
@@ -1159,13 +1176,14 @@ export default function Hero() {
           {showProjects && (
             <motion.div
               className="fixed inset-0 z-[25] flex items-center justify-center"
+              style={{ padding: isMobile ? '0 16px' : undefined }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <div className="flex" style={{ gap: isMobile ? 0 : isTablet ? 12 : 32, ...(isTablet ? { overflowX: 'auto', maxWidth: '95vw', scrollbarWidth: 'none' } : {}), justifyContent: 'center' }}>
-                {PROJECTS.filter((_, idx) => isMobile ? idx === 0 : true).map((project, index) => (
+              <div className="flex" style={{ gap: isMobile ? 16 : isTablet ? 12 : 32, overflowX: isMobile || isTablet ? 'auto' : undefined, maxWidth: isMobile ? 'calc(100vw - 32px)' : isTablet ? '95vw' : undefined, scrollbarWidth: 'none', justifyContent: isMobile ? undefined : 'center' }}>
+                {PROJECTS.map((project, index) => (
                   <motion.div
                     key={project.number}
                     className="relative"
@@ -1173,7 +1191,7 @@ export default function Hero() {
                     animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.15 }}
                     style={{
-                      width: isMobile ? '85vw' : isTablet ? 260 : 340,
+                      width: isMobile ? 'calc(100vw - 48px)' : isTablet ? 260 : 340,
                       background: 'rgba(10,10,10,0.6)',
                       border: '0.5px solid rgba(192,132,252,0.12)',
                       backdropFilter: 'blur(12px)',
