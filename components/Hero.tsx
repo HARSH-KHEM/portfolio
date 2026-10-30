@@ -38,7 +38,7 @@ interface MomentData {
 }
 
 const MOMENTS: MomentData[] = [
-  { label: 'PORTFOLIO', heading: 'Harsh Khem', sub: 'Creative Developer & Motion Engineer', position: 'top-left' },
+  { label: 'PORTFOLIO', heading: 'Harsh Khem', sub: 'Systems · ML · Full-Stack Developer', position: 'top-left' },
   { label: 'WORK', heading: 'Selected Projects', sub: 'Building things that move — hover to explore ↗', position: 'bottom-left' },
   { label: 'CONTACT', heading: "Let's Build Together", sub: 'contact', position: 'bottom-right' },
 ]
@@ -845,13 +845,14 @@ export default function Hero() {
                   { text: 'B.Tech', h: false }, { text: 'SE', h: false }, { text: 'student', h: false },
                   { text: 'at', h: false }, { text: 'Delhi', h: false }, { text: 'Technological', h: false },
                   { text: 'University.', h: false }, { text: 'I', h: false }, { text: 'build', h: false },
-                  { text: 'full', h: false }, { text: 'stack', h: false }, { text: 'products,', h: false },
-                  { text: 'obsess', h: false }, { text: 'over', h: false },
-                  { text: 'motion', h: false }, { text: 'and', h: false }, { text: 'UI,', h: false },
-                  { text: 'and', h: false }, { text: 'write', h: false }, { text: 'code', h: false },
+                  { text: 'operating', h: false }, { text: 'systems,', h: false },
+                  { text: 'ML', h: false }, { text: 'pipelines', h: false }, { text: 'and', h: false },
+                  { text: 'full-stack', h: false }, { text: 'products,', h: false },
+                  { text: 'and', h: false }, { text: 'obsess', h: false }, { text: 'over', h: false },
+                  { text: 'motion', h: false }, { text: 'and', h: false }, { text: 'UI.', h: false },
+                  { text: 'I', h: false }, { text: 'write', h: false }, { text: 'code', h: false },
                   { text: 'the', h: false }, { text: 'way', h: false }, { text: 'others', h: false },
-                  { text: 'listen', h: false }, { text: 'to', h: false }, { text: 'music', h: false },
-                  { text: '—', h: false },
+                  { text: 'listen', h: false }, { text: 'to', h: false }, { text: 'music,', h: false },
                   { text: 'on', h: true }, { text: 'repeat', h: true }, { text: 'until', h: true },
                   { text: "it's", h: true }, { text: 'right.', h: true },
                 ].map((w, i) => (
@@ -878,16 +879,23 @@ export default function Hero() {
               {/* Line 5 — Tags */}
               <motion.div
                 className="flex flex-wrap justify-center mb-9"
-                style={{ gap: isMobile ? 4 : 8 }}
+                style={{ gap: isMobile ? 6 : 8, maxWidth: '100%' }}
                 initial={{ opacity: 0, y: 16, filter: 'blur(14px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 0.8, ease: 'easeOut', delay: 0.85 }}
               >
-                {['DTU', 'Delhi', 'Open to Work', 'Full Stack', 'Motion Dev'].map((tag) => (
+                {['DTU', 'DELHI', 'OPEN TO WORK', 'SYSTEMS', 'ML', 'FULL STACK'].map((tag) => (
                   <span
                     key={tag}
-                    className="tracking-widest uppercase"
-                    style={{ color: '#ffffff', border: '0.5px solid rgba(255,255,255,0.25)', borderRadius: 3, padding: isMobile ? '3px 8px' : '4px 12px', background: 'rgba(255,255,255,0.04)', fontSize: isMobile ? 8 : 9 }}
+                    className="tracking-widest uppercase inline-block whitespace-nowrap"
+                    style={{
+                      color: '#ffffff',
+                      border: '0.5px solid rgba(255,255,255,0.25)',
+                      borderRadius: 3,
+                      padding: isMobile ? '3px 8px' : '4px 12px',
+                      background: 'rgba(255,255,255,0.04)',
+                      fontSize: isMobile ? 8 : 9,
+                    }}
                   >
                     {tag}
                   </span>
