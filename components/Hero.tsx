@@ -2,13 +2,15 @@
 
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import gsap from 'gsap'
 import {
   SiReact, SiNextdotjs, SiTypescript, SiTailwindcss,
   SiGreensock, SiThreedotjs, SiFramer,
   SiNodedotjs, SiExpress, SiMongodb, SiPostgresql,
-  SiRedis, SiGit, SiDocker,
+  SiGit, SiDocker,
   SiPython, SiScikitlearn, SiPandas, SiNumpy,
-  SiN8N, SiJupyter, SiGithub,
+  SiJupyter,
+  SiC, SiCplusplus, SiLinux,
 } from 'react-icons/si'
 import type { IconType } from 'react-icons'
 
@@ -37,7 +39,6 @@ interface MomentData {
 
 const MOMENTS: MomentData[] = [
   { label: 'PORTFOLIO', heading: 'Harsh Khem', sub: 'Creative Developer & Motion Engineer', position: 'top-left' },
-  { label: 'SKILLS', heading: 'Frontend · Motion', sub: 'React · Next.js · GSAP · Canvas · Three.js', position: 'top-right' },
   { label: 'WORK', heading: 'Selected Projects', sub: 'Building things that move — hover to explore ↗', position: 'bottom-left' },
   { label: 'CONTACT', heading: "Let's Build Together", sub: 'contact', position: 'bottom-right' },
 ]
@@ -90,34 +91,53 @@ const PROJECTS: Project[] = [
 
 interface SkillItem { icon: IconType; name: string }
 
-const SKILL_ROWS: SkillItem[][] = [
-  [
-    { icon: SiReact, name: 'React' },
-    { icon: SiNextdotjs, name: 'Next.js' },
-    { icon: SiTypescript, name: 'TypeScript' },
-    { icon: SiTailwindcss, name: 'Tailwind' },
-    { icon: SiGreensock, name: 'GSAP' },
-    { icon: SiThreedotjs, name: 'Three.js' },
-    { icon: SiFramer, name: 'Framer' },
-  ],
-  [
-    { icon: SiNodedotjs, name: 'Node.js' },
-    { icon: SiExpress, name: 'Express' },
-    { icon: SiMongodb, name: 'MongoDB' },
-    { icon: SiPostgresql, name: 'Postgres' },
-    { icon: SiRedis, name: 'Redis' },
-    { icon: SiGit, name: 'Git' },
-    { icon: SiDocker, name: 'Docker' },
-  ],
-  [
-    { icon: SiPython, name: 'Python' },
-    { icon: SiScikitlearn, name: 'Scikit' },
-    { icon: SiPandas, name: 'Pandas' },
-    { icon: SiNumpy, name: 'NumPy' },
-    { icon: SiN8N, name: 'n8n' },
-    { icon: SiJupyter, name: 'Jupyter' },
-    { icon: SiGithub, name: 'GitHub' },
-  ],
+interface SkillGroup {
+  category: string
+  skills: SkillItem[]
+}
+
+const SKILL_GROUPS: SkillGroup[] = [
+  {
+    category: 'SYSTEMS',
+    skills: [
+      { icon: SiC, name: 'C' },
+      { icon: SiCplusplus, name: 'C++' },
+      { icon: SiLinux, name: 'Linux' },
+      { icon: SiGit, name: 'Git' },
+      { icon: SiDocker, name: 'Docker' },
+    ],
+  },
+  {
+    category: 'ML / AI',
+    skills: [
+      { icon: SiPython, name: 'Python' },
+      { icon: SiScikitlearn, name: 'scikit-learn' },
+      { icon: SiPandas, name: 'Pandas' },
+      { icon: SiNumpy, name: 'NumPy' },
+      { icon: SiJupyter, name: 'Jupyter' },
+    ],
+  },
+  {
+    category: 'FULL-STACK',
+    skills: [
+      { icon: SiReact, name: 'React' },
+      { icon: SiNextdotjs, name: 'Next.js' },
+      { icon: SiTypescript, name: 'TypeScript' },
+      { icon: SiNodedotjs, name: 'Node.js' },
+      { icon: SiExpress, name: 'Express' },
+      { icon: SiMongodb, name: 'MongoDB' },
+      { icon: SiPostgresql, name: 'PostgreSQL' },
+      { icon: SiTailwindcss, name: 'Tailwind' },
+    ],
+  },
+  {
+    category: 'MOTION',
+    skills: [
+      { icon: SiGreensock, name: 'GSAP' },
+      { icon: SiThreedotjs, name: 'Three.js' },
+      { icon: SiFramer, name: 'Framer Motion' },
+    ],
+  },
 ]
 
 /* ------------------------------------------------------------------ */
@@ -188,6 +208,7 @@ export default function Hero() {
   const targetRef = useRef(0)
   const rafRef = useRef<number | undefined>(undefined)
   const particlesRef = useRef<Particle[]>([])
+  const skillsRef = useRef<HTMLDivElement>(null)
 
   /* ---- State ---- */
   const [loaded, setLoaded] = useState(false)
@@ -280,7 +301,7 @@ export default function Hero() {
   /* Single dark overlay — opacity driven by scroll position */
   const overlayOpacity = useTransform(
     scrollYProgress,
-    [0, 0.38, 0.41, 0.47, 0.50, 0.51, 0.53, 0.59, 0.62, 0.63, 0.73, 0.76, 0.85, 0.88, 1],
+    [0, 0.20, 0.23, 0.45, 0.48, 0.50, 0.53, 0.59, 0.62, 0.63, 0.73, 0.76, 0.85, 0.88, 1],
     [0, 0,    0.5,  0.5,  0,    0,    0.55, 0.55, 0,    0,    0,    0.55, 0.55, 0,    0],
   )
 
@@ -391,34 +412,60 @@ export default function Hero() {
       targetRef.current = Math.floor(v * (TOTAL_FRAMES - 1))
 
       /* Phase detection */
-      if (v < 0.25) {
-        setMomentIndex(0); setShowMoment(true)
-      } else if (v < 0.40) {
-        setMomentIndex(1); setShowMoment(true)
-      } else if (v < 0.50) {
+      if (v < 0.22) {
+        setMomentIndex(0); setShowMoment(true) /* PORTFOLIO */
+      } else if (v < 0.48) {
         setShowMoment(false) /* skills */
-      } else if (v < 0.62) {
+      } else if (v < 0.63) {
         setShowMoment(false) /* leetcode */
-      } else if (v < 0.75) {
-        setMomentIndex(2); setShowMoment(true)
+      } else if (v < 0.74) {
+        setMomentIndex(1); setShowMoment(true) /* work */
       } else if (v < 0.88) {
         setShowMoment(false) /* projects */
       } else {
-        setMomentIndex(3); setShowMoment(true)
+        setMomentIndex(2); setShowMoment(true) /* contact */
       }
 
       /* Overlay content visibility */
-      setShowSkills(v >= 0.39 && v < 0.51)
-      setShowLeetcode(v >= 0.49 && v < 0.63)
+      setShowSkills(v >= 0.22 && v < 0.47)
+      setShowLeetcode(v >= 0.48 && v < 0.63)
       setShowProjects(v >= 0.74 && v < 0.89)
       setShowBio(v < 0.12)
 
       /* Scroll hint + hero UI */
       if (v > 0.05) setScrolled(true)
-      setHideHeroUI(v > 0.30)
+      setHideHeroUI(v > 0.20)
     })
     return unsub
   }, [scrollYProgress])
+
+  /* ---- Subtle GSAP stagger per group when skills section is shown ---- */
+  useEffect(() => {
+    if (!showSkills || !skillsRef.current) return
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.skill-group-title',
+        { opacity: 0, y: -6 },
+        { opacity: 1, y: 0, duration: 0.35, stagger: 0.06, ease: 'power2.out' }
+      )
+      SKILL_GROUPS.forEach((_, gIdx) => {
+        gsap.fromTo(
+          `.skill-group-${gIdx} .skill-badge-item`,
+          { opacity: 0, y: 10, scale: 0.94 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.4,
+            stagger: 0.035,
+            ease: 'power2.out',
+            delay: 0.04 + gIdx * 0.05,
+          }
+        )
+      })
+    }, skillsRef)
+    return () => ctx.revert()
+  }, [showSkills])
 
   /* ---- Fetch LeetCode stats ---- */
   useEffect(() => {
@@ -492,9 +539,6 @@ export default function Hero() {
       }
 
   const moment = MOMENTS[momentIndex]
-
-  /* Flat skill index for stagger */
-  let skillFlatIdx = 0
 
   /* LeetCode card shared base styles */
   const lcCardBase = {
@@ -880,45 +924,65 @@ export default function Hero() {
         <AnimatePresence>
           {showSkills && (
             <motion.div
-              className="fixed inset-0 z-[25] flex items-center justify-center"
-              style={{ padding: isMobile ? '0 16px' : undefined }}
+              ref={skillsRef}
+              className="fixed inset-0 z-[25] flex items-center justify-center pointer-events-auto"
+              style={{ padding: isMobile ? '0 16px' : '0 24px' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <div className="flex flex-col items-center">
-                {/* Label */}
+              <div
+                className="flex flex-col items-center w-full max-w-4xl"
+                style={{
+                  maxHeight: '88vh',
+                  overflowY: 'auto',
+                }}
+              >
+                {/* Main section label */}
                 <motion.span
-                  className="uppercase mb-10 text-[10px]"
+                  className="uppercase mb-5 text-[10px]"
                   style={{ color: TEXT_MUTED, letterSpacing: '0.3em' }}
                   initial={{ opacity: 0, filter: 'blur(12px)' }}
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
-                  transition={{ duration: 0.6 }}
+                  transition={{ duration: 0.5 }}
                 >
                   SKILLS
                 </motion.span>
 
-                {/* Icon rows */}
-                <div className="flex flex-col items-center" style={{ gap: isMobile ? 8 : isTablet ? 12 : 24 }}>
-                  {SKILL_ROWS.map((row, rowIdx) => {
-                    return (
-                    <div key={rowIdx} className="flex justify-center" style={{ gap: isMobile ? 8 : isTablet ? 12 : 24, flexWrap: isMobile ? 'wrap' : undefined }}>
-                      {row.map((skill) => {
-                        const flatI = skillFlatIdx++
-                        return (
-                          <motion.div
+                {/* Skill Groups */}
+                <div
+                  className="flex flex-col items-center w-full"
+                  style={{ gap: isMobile ? 14 : isTablet ? 16 : 20 }}
+                >
+                  {SKILL_GROUPS.map((group, groupIdx) => (
+                    <div
+                      key={group.category}
+                      className={`skill-group-${groupIdx} flex flex-col items-center w-full`}
+                    >
+                      {/* Sub-label */}
+                      <span
+                        className="skill-group-title text-[9px] tracking-[0.25em] font-mono uppercase mb-2 text-center"
+                        style={{ color: TEXT_MUTED }}
+                      >
+                        {group.category}
+                      </span>
+
+                      {/* Badges */}
+                      <div
+                        className="flex flex-wrap justify-center items-center"
+                        style={{ gap: isMobile ? 8 : isTablet ? 10 : 14 }}
+                      >
+                        {group.skills.map((skill) => (
+                          <div
                             key={skill.name}
-                            className="flex flex-col items-center group"
-                            initial={{ opacity: 0, y: 12, filter: 'blur(8px)' }}
-                            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                            transition={{ duration: 0.6, delay: 0.04 * flatI, ease: 'easeOut' }}
+                            className="skill-badge-item flex flex-col items-center group"
                           >
                             <div
                               className="skill-card flex items-center justify-center cursor-default"
                               style={{
-                                width: isMobile ? 44 : isTablet ? 48 : 52,
-                                height: isMobile ? 44 : isTablet ? 48 : 52,
+                                width: isMobile ? 40 : isTablet ? 46 : 50,
+                                height: isMobile ? 40 : isTablet ? 46 : 50,
                                 background: 'rgba(192,132,252,0.06)',
                                 border: '0.5px solid rgba(192,132,252,0.2)',
                                 borderRadius: 6,
@@ -928,14 +992,16 @@ export default function Hero() {
                                 e.currentTarget.style.background = 'rgba(192,132,252,0.12)'
                                 e.currentTarget.style.borderColor = 'rgba(192,132,252,0.6)'
                                 e.currentTarget.style.transform = 'translateY(-2px)'
-                                e.currentTarget.style.boxShadow = '0 0 20px rgba(192,132,252,0.25), 0 0 40px rgba(192,132,252,0.1), inset 0 1px 0 rgba(255,255,255,0.1)'
+                                e.currentTarget.style.boxShadow =
+                                  '0 0 20px rgba(192,132,252,0.25), 0 0 40px rgba(192,132,252,0.1), inset 0 1px 0 rgba(255,255,255,0.1)'
                                 const svg = e.currentTarget.querySelector('svg')
                                 if (svg) {
                                   svg.style.color = ACCENT_SECONDARY
                                   svg.style.filter = `drop-shadow(0 0 6px ${ACCENT_PRIMARY})`
                                 }
-                                /* Label color */
-                                const label = e.currentTarget.parentElement?.querySelector('.skill-label') as HTMLElement | null
+                                const label = e.currentTarget.parentElement?.querySelector(
+                                  '.skill-label'
+                                ) as HTMLElement | null
                                 if (label) label.style.color = TEXT_MID
                               }}
                               onMouseLeave={(e) => {
@@ -948,25 +1014,33 @@ export default function Hero() {
                                   svg.style.color = TEXT_MID
                                   svg.style.filter = 'none'
                                 }
-                                const label = e.currentTarget.parentElement?.querySelector('.skill-label') as HTMLElement | null
+                                const label = e.currentTarget.parentElement?.querySelector(
+                                  '.skill-label'
+                                ) as HTMLElement | null
                                 if (label) label.style.color = TEXT_MUTED
                               }}
                             >
-                              <skill.icon size={isMobile ? 18 : 22} style={{ color: TEXT_MID, transition: 'color 0.3s, filter 0.3s' }} />
+                              <skill.icon
+                                size={isMobile ? 18 : 22}
+                                style={{ color: TEXT_MID, transition: 'color 0.3s, filter 0.3s' }}
+                              />
                             </div>
                             <span
-                              className="skill-label tracking-widest uppercase text-center mt-2"
-                              style={{ color: TEXT_MUTED, transition: 'color 0.3s', fontSize: 9, ...(isMobile ? { padding: '4px 10px' } : {}) }}
-
+                              className="skill-label tracking-widest uppercase text-center mt-1.5"
+                              style={{
+                                color: TEXT_MUTED,
+                                transition: 'color 0.3s',
+                                fontSize: 9,
+                                ...(isMobile ? { padding: '2px 6px' } : {}),
+                              }}
                             >
                               {skill.name}
                             </span>
-                          </motion.div>
-                        )
-                      })}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  )})
-                  }
+                  ))}
                 </div>
               </div>
             </motion.div>
