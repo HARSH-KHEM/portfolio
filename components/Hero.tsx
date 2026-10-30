@@ -50,42 +50,43 @@ const SOCIALS = [
   { href: 'https://leetcode.com/u/harshkh08/', label: 'LeetCode', icon: 'leetcode' },
 ]
 
-interface Project {
-  number: string
-  name: string
+interface ProjectItem {
+  title: string
   description: string
   tags: string[]
-  liveLink: string | null
-  githubLink: string | null
-  badge?: string
+  featured?: boolean
+  demoUrl?: string
+  sourceUrl?: string
 }
 
-const PROJECTS: Project[] = [
+const PROJECTS: ProjectItem[] = [
   {
-    number: '01',
-    name: 'DDoS Attack Classifier',
-    description: 'Authenticates and classifies network traffic as legitimate or DDoS attack in real time using machine learning.',
-    tags: ['Python', 'Machine Learning', 'Scikit-learn', 'Network Security'],
-    liveLink: 'https://hackarsh08-ddos-detection.hf.space/',
-    githubLink: 'https://github.com/HARSH-KHEM/ddos-detection',
+    title: 'XeteX-OS',
+    description: 'A from-scratch custom operating system in C, with kernel architecture and virtual memory manager work.',
+    tags: ['C', 'OS Dev', 'VMM', 'Kernel'],
+    featured: true,
+    sourceUrl: 'https://github.com/HARSH-KHEM/XeteX-OS',
   },
   {
-    number: '02',
-    name: 'Coming Soon',
-    description: 'Next project in progress.',
-    tags: ['TBD'],
-    liveLink: null,
-    githubLink: null,
-    badge: 'In Progress',
+    title: 'AquaGuard AI',
+    description: 'Predictive platform that estimates drinking-water contamination risk, built for the Google Cloud Gen AI Academy APAC Hackathon.',
+    tags: ['Python', 'GenAI', 'Google Cloud', 'ML'],
+    // TODO: add URL (demoUrl)
+    // TODO: add URL (sourceUrl)
   },
   {
-    number: '03',
-    name: 'Coming Soon',
-    description: 'Next project in progress.',
-    tags: ['TBD'],
-    liveLink: null,
-    githubLink: null,
-    badge: 'In Progress',
+    title: 'ICD (Intelligent Candidate Discovery)',
+    description: 'Candidate-ranking pipeline built for the India Runs Hackathon.',
+    tags: ['Python', 'ML', 'Ranking'],
+    sourceUrl: 'https://github.com/HARSH-KHEM/icd',
+    // TODO: add URL (demoUrl)
+  },
+  {
+    title: 'DDoS Attack Classifier',
+    description: 'Classifies network traffic as legitimate or DDoS in real time using machine learning.',
+    tags: ['Python', 'scikit-learn', 'Network Security'],
+    demoUrl: 'https://hackarsh08-ddos-detection.hf.space/',
+    sourceUrl: 'https://github.com/HARSH-KHEM/ddos-detection',
   },
 ]
 
@@ -1257,125 +1258,172 @@ export default function Hero() {
         <AnimatePresence>
           {showProjects && (
             <motion.div
-              className="fixed inset-0 z-[25] flex items-center justify-center"
-              style={{ padding: isMobile ? '0 16px' : undefined }}
+              className="fixed inset-0 z-[25] flex items-center justify-center pointer-events-auto"
+              style={{ padding: isMobile ? '0 16px' : '0 24px' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <div className="flex" style={{ gap: isMobile ? 16 : isTablet ? 12 : 32, overflowX: isMobile || isTablet ? 'auto' : undefined, maxWidth: isMobile ? 'calc(100vw - 32px)' : isTablet ? '95vw' : undefined, scrollbarWidth: 'none', justifyContent: isMobile ? undefined : 'center' }}>
-                {PROJECTS.map((project, index) => (
-                  <motion.div
-                    key={project.number}
-                    className="relative"
-                    initial={{ opacity: 0, y: 32, filter: 'blur(16px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    transition={{ duration: 0.8, ease: 'easeOut', delay: index * 0.15 }}
-                    style={{
-                      width: isMobile ? 'calc(100vw - 48px)' : isTablet ? 260 : 340,
-                      background: 'rgba(10,10,10,0.6)',
-                      border: '0.5px solid rgba(192,132,252,0.12)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      borderRadius: 4,
-                      padding: isMobile ? 20 : 32,
-                      flexShrink: 0,
-                    }}
-                  >
-                    {/* Badge */}
-                    {project.badge && (
-                      <span
-                        className="absolute top-4 right-4 text-[9px] rounded-full px-3 py-1"
-                        style={{
-                          color: TEXT_MUTED,
-                          border: '1px solid rgba(192,132,252,0.2)',
-                        }}
-                      >
-                        {project.badge}
-                      </span>
-                    )}
-
-                    {/* Number */}
-                    <p className="text-[10px] font-mono tracking-widest mb-4" style={{ color: TEXT_MUTED }}>
-                      PROJECT {project.number}
-                    </p>
-
-                    {/* Name */}
-                    <h3 className="text-lg font-medium mb-3" style={{ color: TEXT_BRIGHT }}>
-                      {project.name}
-                    </h3>
-
-                    {/* Description */}
-                    <p
-                      className="text-sm leading-relaxed mb-5"
+              <div
+                className="w-full max-w-4xl"
+                style={{
+                  maxHeight: isMobile ? '82vh' : '85vh',
+                  overflowY: 'auto',
+                  padding: '4px',
+                }}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 md:gap-5 w-full">
+                  {PROJECTS.map((project, index) => (
+                    <motion.div
+                      key={project.title}
+                      className="relative flex flex-col justify-between"
+                      initial={{ opacity: 0, y: 24, filter: 'blur(12px)' }}
+                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                      transition={{ duration: 0.6, ease: 'easeOut', delay: index * 0.1 }}
                       style={{
-                        color: TEXT_MUTED,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
+                        background: project.featured ? 'rgba(20,10,32,0.7)' : 'rgba(10,10,10,0.6)',
+                        border: project.featured
+                          ? '1px solid rgba(192,132,252,0.4)'
+                          : '0.5px solid rgba(192,132,252,0.12)',
+                        boxShadow: project.featured
+                          ? '0 0 25px rgba(192,132,252,0.12), inset 0 0 15px rgba(192,132,252,0.04)'
+                          : 'none',
+                        backdropFilter: 'blur(12px)',
+                        WebkitBackdropFilter: 'blur(12px)',
+                        borderRadius: 6,
+                        padding: isMobile ? 18 : 24,
+                        transition: 'all 0.3s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(192,132,252,0.5)'
+                        e.currentTarget.style.transform = 'translateY(-2px)'
+                        e.currentTarget.style.boxShadow =
+                          '0 0 30px rgba(192,132,252,0.2), inset 0 0 20px rgba(192,132,252,0.06)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = project.featured
+                          ? 'rgba(192,132,252,0.4)'
+                          : 'rgba(192,132,252,0.12)'
+                        e.currentTarget.style.transform = 'translateY(0px)'
+                        e.currentTarget.style.boxShadow = project.featured
+                          ? '0 0 25px rgba(192,132,252,0.12), inset 0 0 15px rgba(192,132,252,0.04)'
+                          : 'none'
                       }}
                     >
-                      {project.description}
-                    </p>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {project.tags.map((tag) => (
+                      {/* Featured Badge */}
+                      {project.featured && (
                         <span
-                          key={tag}
-                          className="text-[9px] rounded-sm px-2 py-1 tracking-widest uppercase cursor-default transition-all duration-300"
+                          className="absolute top-4 right-4 text-[9px] font-mono tracking-widest uppercase rounded-full px-2.5 py-0.5"
                           style={{
-                            color: TEXT_MID,
-                            border: '1px solid rgba(192,132,252,0.2)',
+                            color: ACCENT_PRIMARY,
+                            background: 'rgba(192,132,252,0.12)',
+                            border: '1px solid rgba(192,132,252,0.3)',
                           }}
-                          onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(192,132,252,0.5)' }}
-                          onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(192,132,252,0.2)' }}
                         >
-                          {tag}
+                          FEATURED
                         </span>
-                      ))}
-                    </div>
+                      )}
 
-                    {/* Links */}
-                    {(project.liveLink || project.githubLink) && (
-                      <div className="flex items-center gap-2">
-                        {project.liveLink && (
-                          <a
-                            href={project.liveLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-[10px] tracking-widest uppercase no-underline transition-colors duration-300"
-                            style={{ color: ACCENT_PRIMARY }}
-                            onMouseEnter={(e) => { e.currentTarget.style.color = ACCENT_SECONDARY }}
-                            onMouseLeave={(e) => { e.currentTarget.style.color = ACCENT_PRIMARY }}
-                          >
-                            <ExternalLinkSvg />
-                            LIVE DEMO
-                          </a>
-                        )}
-                        {project.liveLink && project.githubLink && (
-                          <div className="w-px h-3 mx-2" style={{ background: 'rgba(192,132,252,0.2)' }} />
-                        )}
-                        {project.githubLink && (
-                          <a
-                            href={project.githubLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-[10px] tracking-widest uppercase no-underline transition-colors duration-300"
-                            style={{ color: TEXT_MUTED }}
-                            onMouseEnter={(e) => { e.currentTarget.style.color = ACCENT_PRIMARY }}
-                            onMouseLeave={(e) => { e.currentTarget.style.color = TEXT_MUTED }}
-                          >
-                            <GithubSvg />
-                            SOURCE
-                          </a>
-                        )}
+                      <div>
+                        {/* Number */}
+                        <p
+                          className="text-[10px] font-mono tracking-widest mb-3"
+                          style={{ color: project.featured ? ACCENT_PRIMARY : TEXT_MUTED }}
+                        >
+                          PROJECT 0{index + 1}
+                        </p>
+
+                        {/* Title */}
+                        <h3 className="text-base sm:text-lg font-medium mb-2" style={{ color: TEXT_BRIGHT }}>
+                          {project.title}
+                        </h3>
+
+                        {/* Description */}
+                        <p
+                          className="text-xs sm:text-sm leading-relaxed mb-4"
+                          style={{
+                            color: TEXT_MUTED,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {project.description}
+                        </p>
+
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-1.5 mb-5">
+                          {project.tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="text-[9px] rounded-sm px-2 py-0.5 tracking-widest uppercase cursor-default transition-all duration-300"
+                              style={{
+                                color: TEXT_MID,
+                                border: '1px solid rgba(192,132,252,0.2)',
+                                background: 'rgba(192,132,252,0.04)',
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.borderColor = 'rgba(192,132,252,0.5)'
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.borderColor = 'rgba(192,132,252,0.2)'
+                              }}
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    )}
-                  </motion.div>
-                ))}
+
+                      {/* Links */}
+                      {(project.demoUrl || project.sourceUrl) && (
+                        <div className="flex items-center gap-2 pt-2 border-t border-[rgba(192,132,252,0.08)]">
+                          {project.demoUrl && (
+                            <a
+                              href={project.demoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 text-[10px] tracking-widest uppercase no-underline transition-colors duration-300"
+                              style={{ color: ACCENT_PRIMARY }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.color = ACCENT_SECONDARY
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = ACCENT_PRIMARY
+                              }}
+                            >
+                              <ExternalLinkSvg />
+                              LIVE DEMO
+                            </a>
+                          )}
+                          {project.demoUrl && project.sourceUrl && (
+                            <div className="w-px h-3 mx-1.5" style={{ background: 'rgba(192,132,252,0.2)' }} />
+                          )}
+                          {project.sourceUrl && (
+                            <a
+                              href={project.sourceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 text-[10px] tracking-widest uppercase no-underline transition-colors duration-300"
+                              style={{ color: TEXT_MUTED }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.color = ACCENT_PRIMARY
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = TEXT_MUTED
+                              }}
+                            >
+                              <GithubSvg />
+                              SOURCE
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
               </div>
             </motion.div>
           )}
