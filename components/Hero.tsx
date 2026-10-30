@@ -45,7 +45,7 @@ const MOMENTS: MomentData[] = [
 
 const SOCIALS = [
   { href: 'https://github.com/HARSH-KHEM', label: 'GitHub', icon: 'github' },
-  { href: 'https://www.linkedin.com/in/harshkhem08', label: 'LinkedIn', icon: 'linkedin' },
+  { href: 'https://www.linkedin.com/in/harsh-khem-76b76a345/', label: 'LinkedIn', icon: 'linkedin' },
   { href: 'https://x.com/harshkh0805', label: 'X', icon: 'x' },
   { href: 'https://leetcode.com/u/harshkh08/', label: 'LeetCode', icon: 'leetcode' },
 ]
@@ -720,19 +720,23 @@ export default function Hero() {
                         hackarsh08@gmail.com
                       </a>
                     </div>
-                    {/* Phone */}
+                    {/* LinkedIn */}
                     <div className="flex items-center gap-3">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7e5baa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
-                        <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                        <rect x="2" y="9" width="4" height="12" />
+                        <circle cx="4" cy="4" r="2" />
                       </svg>
                       <a
-                        href="tel:+919315839562"
+                        href="https://www.linkedin.com/in/harsh-khem-76b76a345/"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-sm no-underline transition-colors duration-300"
                         style={{ color: TEXT_MID }}
                         onMouseEnter={(e) => { e.currentTarget.style.color = ACCENT_SECONDARY }}
                         onMouseLeave={(e) => { e.currentTarget.style.color = TEXT_MID }}
                       >
-                        +91 93158 39562
+                        LinkedIn
                       </a>
                     </div>
                   </div>
