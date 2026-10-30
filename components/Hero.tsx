@@ -22,7 +22,7 @@ const ACCENT_SECONDARY = '#f472b6'
 const ACCENT_DIM = '#7c3aed'
 const TEXT_BRIGHT = '#faf5ff'
 const TEXT_MID = '#d8b4fe'
-const TEXT_MUTED = '#7e5baa'
+const TEXT_MUTED = '#a78bfa'
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -152,7 +152,9 @@ interface Particle {
 }
 
 /* ------------------------------------------------------------------ */
-/*  LeetCode types                                                     */
+/*  LeetCode types & Configuration                                     */
+/*  To update profile info or default fallback display stats, edit     */
+/*  LEETCODE_CONFIG below. Live data from /api/leetcode updates these. */
 /* ------------------------------------------------------------------ */
 interface LeetCodeStats {
   totalSolved: number | string
@@ -163,6 +165,34 @@ interface LeetCodeStats {
   streak: number
   totalActiveDays: number
   calendarRaw: string
+}
+
+interface LeetCodeDisplayConfig {
+  username: string
+  profileUrl: string
+  defaultStats: {
+    totalSolved: number | string
+    breakdown: string
+    overallRank: string
+    contestRank: string
+    contestRating: number | string
+    streak: number
+    totalActiveDays: number
+  }
+}
+
+const LEETCODE_CONFIG: LeetCodeDisplayConfig = {
+  username: 'harshkh08',
+  profileUrl: 'https://leetcode.com/u/harshkh08/',
+  defaultStats: {
+    totalSolved: '—',
+    breakdown: '— / — / —',
+    overallRank: '—',
+    contestRank: '—',
+    contestRating: '—',
+    streak: 0,
+    totalActiveDays: 0,
+  },
 }
 
 /* ------------------------------------------------------------------ */
@@ -672,7 +702,12 @@ export default function Hero() {
               {/* Label */}
               <motion.span
                 className="uppercase mb-3"
-                style={{ color: TEXT_MUTED, letterSpacing: '0.3em', fontSize: isMobile ? 9 : 10 }}
+                style={{
+                  color: '#d8b4fe',
+                  letterSpacing: '0.3em',
+                  fontSize: isMobile ? 9 : 10,
+                  textShadow: '0 1px 8px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)',
+                }}
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0 }}
               >
                 {moment.label}
@@ -690,7 +725,10 @@ export default function Hero() {
                         WebkitTextFillColor: 'transparent',
                         textShadow: '0 2px 32px rgba(192,132,252,0.3)',
                       }
-                    : { color: TEXT_BRIGHT }),
+                    : {
+                        color: TEXT_BRIGHT,
+                        textShadow: '0 2px 20px rgba(0,0,0,0.95), 0 0 4px rgba(0,0,0,0.9)',
+                      }),
                 }}
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
               >
@@ -704,25 +742,34 @@ export default function Hero() {
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
               >
                 {moment.sub === 'contact' ? (
-                  <div className="flex flex-col gap-3 mt-1">
+                  <div
+                    className="flex flex-col gap-3.5 mt-2.5 p-4 rounded-lg"
+                    style={{
+                      background: 'rgba(10,5,20,0.65)',
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
+                      border: '0.5px solid rgba(192,132,252,0.2)',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
+                    }}
+                  >
                     {/* Email */}
                     <div className="flex items-center gap-3">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7e5baa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d8b4fe" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
                         <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                       <a
                         href="mailto:hackarsh08@gmail.com"
-                        className="text-sm no-underline transition-colors duration-300"
-                        style={{ color: TEXT_MID }}
+                        className="text-sm font-medium no-underline transition-colors duration-300"
+                        style={{ color: '#faf5ff', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}
                         onMouseEnter={(e) => { e.currentTarget.style.color = ACCENT_SECONDARY }}
-                        onMouseLeave={(e) => { e.currentTarget.style.color = TEXT_MID }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = '#faf5ff' }}
                       >
                         hackarsh08@gmail.com
                       </a>
                     </div>
                     {/* LinkedIn */}
                     <div className="flex items-center gap-3">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7e5baa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d8b4fe" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
                         <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
                         <rect x="2" y="9" width="4" height="12" />
                         <circle cx="4" cy="4" r="2" />
@@ -731,16 +778,18 @@ export default function Hero() {
                         href="https://www.linkedin.com/in/harsh-khem-76b76a345/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm no-underline transition-colors duration-300"
-                        style={{ color: TEXT_MID }}
+                        className="text-sm font-medium no-underline transition-colors duration-300"
+                        style={{ color: '#faf5ff', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}
                         onMouseEnter={(e) => { e.currentTarget.style.color = ACCENT_SECONDARY }}
-                        onMouseLeave={(e) => { e.currentTarget.style.color = TEXT_MID }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = '#faf5ff' }}
                       >
                         LinkedIn
                       </a>
                     </div>
                   </div>
-                ) : moment.sub}
+                ) : (
+                  <span style={{ textShadow: '0 1px 8px rgba(0,0,0,0.9)' }}>{moment.sub}</span>
+                )}
               </motion.div>
 
               {/* Accent line */}
@@ -805,7 +854,7 @@ export default function Hero() {
             ))}
           </div>
           {!isMobile && (
-            <span className="text-[10px] tracking-widest font-mono" style={{ color: '#3a1d5c' }}>
+            <span className="text-[10px] tracking-widest font-mono" style={{ color: '#c4b5fd', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
               @harshkhem
             </span>
           )}
@@ -840,7 +889,7 @@ export default function Hero() {
                     animate={{ scale: [1, 1.5, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   />
-                  <span style={{ fontSize: isMobile ? 8 : 10, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.8)' }}>Available for opportunities</span>
+                  <span style={{ fontSize: isMobile ? 8 : 10, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.9)', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>Available for opportunities</span>
                 </div>
               </motion.div>
 
@@ -866,7 +915,7 @@ export default function Hero() {
                     style={{
                       color: w.h ? '#e879f9' : '#ffffff',
                       fontWeight: w.h ? 600 : 400,
-                      textShadow: '0 1px 4px rgba(0,0,0,0.8)',
+                      textShadow: '0 2px 10px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,0.9)',
                     }}
                     initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
                     animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -895,11 +944,12 @@ export default function Hero() {
                     className="tracking-widest uppercase inline-block whitespace-nowrap"
                     style={{
                       color: '#ffffff',
-                      border: '0.5px solid rgba(255,255,255,0.25)',
+                      border: '0.5px solid rgba(255,255,255,0.3)',
                       borderRadius: 3,
                       padding: isMobile ? '3px 8px' : '4px 12px',
-                      background: 'rgba(255,255,255,0.04)',
+                      background: 'rgba(255,255,255,0.08)',
                       fontSize: isMobile ? 8 : 9,
+                      textShadow: '0 1px 3px rgba(0,0,0,0.8)',
                     }}
                   >
                     {tag}
@@ -915,12 +965,12 @@ export default function Hero() {
               >
                 <div className="flex items-center justify-center gap-3">
                   <div className="w-12 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3))' }} />
-                  <span className="text-[10px] tracking-[0.25em] uppercase" style={{ color: 'rgba(255,255,255,0.6)' }}>scroll to explore</span>
+                  <span className="text-[10px] tracking-[0.25em] uppercase" style={{ color: 'rgba(255,255,255,0.7)', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>scroll to explore</span>
                   <div className="w-12 h-px" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.3), transparent)' }} />
                 </div>
                 <motion.div
                   className="text-center mt-2"
-                  style={{ color: '#e879f9', fontSize: 12 }}
+                  style={{ color: '#e879f9', fontSize: 12, textShadow: '0 0 8px rgba(232,121,249,0.5)' }}
                   animate={{ y: [0, 5, 0], opacity: [0.3, 1, 0.3] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
@@ -955,7 +1005,11 @@ export default function Hero() {
                 {/* Main section label */}
                 <motion.span
                   className="uppercase mb-5 text-[10px]"
-                  style={{ color: TEXT_MUTED, letterSpacing: '0.3em' }}
+                  style={{
+                    color: '#d8b4fe',
+                    letterSpacing: '0.3em',
+                    textShadow: '0 1px 8px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9)',
+                  }}
                   initial={{ opacity: 0, filter: 'blur(12px)' }}
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
                   transition={{ duration: 0.5 }}
@@ -976,7 +1030,10 @@ export default function Hero() {
                       {/* Sub-label */}
                       <span
                         className="skill-group-title text-[9px] tracking-[0.25em] font-mono uppercase mb-2 text-center"
-                        style={{ color: TEXT_MUTED }}
+                        style={{
+                          color: '#c4b5fd',
+                          textShadow: '0 1px 4px rgba(0,0,0,0.85)',
+                        }}
                       >
                         {group.category}
                       </span>
@@ -1015,7 +1072,10 @@ export default function Hero() {
                                 const label = e.currentTarget.parentElement?.querySelector(
                                   '.skill-label'
                                 ) as HTMLElement | null
-                                if (label) label.style.color = TEXT_MID
+                                if (label) {
+                                  label.style.color = '#ffffff'
+                                  label.style.textShadow = '0 0 8px rgba(192,132,252,0.8)'
+                                }
                               }}
                               onMouseLeave={(e) => {
                                 e.currentTarget.style.background = 'rgba(192,132,252,0.06)'
@@ -1030,7 +1090,10 @@ export default function Hero() {
                                 const label = e.currentTarget.parentElement?.querySelector(
                                   '.skill-label'
                                 ) as HTMLElement | null
-                                if (label) label.style.color = TEXT_MUTED
+                                if (label) {
+                                  label.style.color = '#c4b5fd'
+                                  label.style.textShadow = '0 1px 4px rgba(0,0,0,0.85)'
+                                }
                               }}
                             >
                               <skill.icon
@@ -1041,8 +1104,9 @@ export default function Hero() {
                             <span
                               className="skill-label tracking-widest uppercase text-center mt-1.5"
                               style={{
-                                color: TEXT_MUTED,
-                                transition: 'color 0.3s',
+                                color: '#c4b5fd',
+                                textShadow: '0 1px 4px rgba(0,0,0,0.85)',
+                                transition: 'color 0.3s, text-shadow 0.3s',
                                 fontSize: 9,
                                 ...(isMobile ? { padding: '2px 6px' } : {}),
                               }}
@@ -1107,30 +1171,30 @@ export default function Hero() {
 
                   {/* Header row */}
                   <div className="flex items-baseline justify-between mb-5">
-                    <p className="text-[10px] uppercase" style={{ color: TEXT_MUTED, letterSpacing: '0.3em' }}>
+                    <p className="text-[10px] uppercase" style={{ color: '#d8b4fe', letterSpacing: '0.3em', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
                       LEETCODE
                     </p>
                     <a
-                      href="https://leetcode.com/u/harshkh08/"
+                      href={LEETCODE_CONFIG.profileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs font-mono no-underline transition-colors duration-300"
-                      style={{ color: ACCENT_PRIMARY }}
+                      style={{ color: ACCENT_PRIMARY, textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}
                       onMouseEnter={(e) => { e.currentTarget.style.color = ACCENT_SECONDARY }}
                       onMouseLeave={(e) => { e.currentTarget.style.color = ACCENT_PRIMARY }}
                     >
-                      @harshkh08
+                      @{LEETCODE_CONFIG.username}
                     </a>
                   </div>
 
                   {/* Stats — horizontal grid */}
                   <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(5, 1fr)', gap: 0 }}>
                     {[
-                      { label: 'Total Solved', value: lcStats?.totalSolved },
-                      ...(isMobile ? [] : [{ label: 'Easy/Med/Hard', value: lcStats?.breakdown }]),
-                      ...(isMobile ? [] : [{ label: 'Overall Rank', value: lcStats?.overallRank }]),
-                      { label: 'Contest Rating', value: lcStats?.contestRating },
-                      { label: 'Day Streak', value: lcStats ? `${lcStats.streak} 🔥` : undefined },
+                      { label: 'Total Solved', value: lcStats?.totalSolved ?? LEETCODE_CONFIG.defaultStats.totalSolved },
+                      ...(isMobile ? [] : [{ label: 'Easy/Med/Hard', value: lcStats?.breakdown ?? LEETCODE_CONFIG.defaultStats.breakdown }]),
+                      ...(isMobile ? [] : [{ label: 'Overall Rank', value: lcStats?.overallRank ?? LEETCODE_CONFIG.defaultStats.overallRank }]),
+                      { label: 'Contest Rating', value: lcStats?.contestRating ?? LEETCODE_CONFIG.defaultStats.contestRating },
+                      { label: 'Day Streak', value: lcStats ? `${lcStats.streak} 🔥` : `${LEETCODE_CONFIG.defaultStats.streak} 🔥` },
                     ].map((stat, idx) => (
                       <div
                         key={stat.label}
@@ -1151,7 +1215,13 @@ export default function Hero() {
                         )}
                         <span
                           className="text-center mt-2"
-                          style={{ fontSize: 9, color: TEXT_MUTED, letterSpacing: '0.15em', textTransform: 'uppercase' }}
+                          style={{
+                            fontSize: 9,
+                            color: '#c4b5fd',
+                            letterSpacing: '0.15em',
+                            textTransform: 'uppercase',
+                            textShadow: '0 1px 4px rgba(0,0,0,0.8)',
+                          }}
                         >
                           {stat.label}
                         </span>
@@ -1180,7 +1250,7 @@ export default function Hero() {
                     background: `linear-gradient(90deg, transparent, ${ACCENT_PRIMARY}, ${ACCENT_SECONDARY}, transparent)`,
                   }} />
 
-                  <p className="text-[10px] uppercase mb-4" style={{ color: TEXT_MUTED, letterSpacing: '0.3em' }}>
+                  <p className="text-[10px] uppercase mb-4" style={{ color: '#d8b4fe', letterSpacing: '0.3em', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
                     ACTIVITY
                   </p>
 
@@ -1190,7 +1260,7 @@ export default function Hero() {
                       const actualCol = isMobile ? col : col
                       const match = heatmapMonths.find(m => m.col === actualCol)
                       return (
-                        <div key={col} style={{ fontSize: 7, color: '#3a1d5c', letterSpacing: '0.05em', lineHeight: '10px' }}>
+                        <div key={col} style={{ fontSize: 7, color: '#c4b5fd', letterSpacing: '0.05em', lineHeight: '10px', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
                           {match ? match.label : ''}
                         </div>
                       )
@@ -1245,10 +1315,19 @@ export default function Hero() {
                   </div>
 
                   {/* Footer */}
-                  <p className="text-center mt-3" style={{ fontSize: 9, color: '#3a1d5c', letterSpacing: '0.15em' }}>
+                  <p
+                    className="text-center mt-3"
+                    style={{
+                      fontSize: 11,
+                      color: '#d8b4fe',
+                      fontWeight: 500,
+                      letterSpacing: '0.15em',
+                      textShadow: '0 1px 4px rgba(0,0,0,0.85)',
+                    }}
+                  >
                     {lcStats
                       ? `${lcStats.totalActiveDays} active days · ${lcStats.streak} day streak`
-                      : 'Loading activity...'}
+                      : `${LEETCODE_CONFIG.defaultStats.totalActiveDays} active days · ${LEETCODE_CONFIG.defaultStats.streak} day streak`}
                   </p>
                 </motion.div>
               </div>
@@ -1277,19 +1356,19 @@ export default function Hero() {
                   padding: '4px',
                 }}
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 md:gap-5 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 md:gap-5 w-full items-stretch">
                   {PROJECTS.map((project, index) => (
                     <motion.div
                       key={project.title}
-                      className="relative flex flex-col justify-between"
+                      className="relative flex flex-col justify-between h-full"
                       initial={{ opacity: 0, y: 24, filter: 'blur(12px)' }}
                       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                       transition={{ duration: 0.6, ease: 'easeOut', delay: index * 0.1 }}
                       style={{
                         background: project.featured ? 'rgba(20,10,32,0.7)' : 'rgba(10,10,10,0.6)',
                         border: project.featured
-                          ? '1px solid rgba(192,132,252,0.4)'
-                          : '0.5px solid rgba(192,132,252,0.12)',
+                          ? '1px solid rgba(192,132,252,0.45)'
+                          : '1px solid rgba(192,132,252,0.16)',
                         boxShadow: project.featured
                           ? '0 0 25px rgba(192,132,252,0.12), inset 0 0 15px rgba(192,132,252,0.04)'
                           : 'none',
@@ -1307,8 +1386,8 @@ export default function Hero() {
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.borderColor = project.featured
-                          ? 'rgba(192,132,252,0.4)'
-                          : 'rgba(192,132,252,0.12)'
+                          ? 'rgba(192,132,252,0.45)'
+                          : 'rgba(192,132,252,0.16)'
                         e.currentTarget.style.transform = 'translateY(0px)'
                         e.currentTarget.style.boxShadow = project.featured
                           ? '0 0 25px rgba(192,132,252,0.12), inset 0 0 15px rgba(192,132,252,0.04)'
@@ -1333,7 +1412,7 @@ export default function Hero() {
                         {/* Number */}
                         <p
                           className="text-[10px] font-mono tracking-widest mb-3"
-                          style={{ color: project.featured ? ACCENT_PRIMARY : TEXT_MUTED }}
+                          style={{ color: project.featured ? ACCENT_PRIMARY : '#c4b5fd', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}
                         >
                           PROJECT 0{index + 1}
                         </p>
@@ -1347,7 +1426,8 @@ export default function Hero() {
                         <p
                           className="text-xs sm:text-sm leading-relaxed mb-4"
                           style={{
-                            color: TEXT_MUTED,
+                            color: '#e2d4f8',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.8)',
                             display: '-webkit-box',
                             WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
@@ -1364,9 +1444,10 @@ export default function Hero() {
                               key={tag}
                               className="text-[9px] rounded-sm px-2 py-0.5 tracking-widest uppercase cursor-default transition-all duration-300"
                               style={{
-                                color: TEXT_MID,
+                                color: '#c4b5fd',
                                 border: '1px solid rgba(192,132,252,0.2)',
                                 background: 'rgba(192,132,252,0.04)',
+                                textShadow: '0 1px 2px rgba(0,0,0,0.8)',
                               }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.borderColor = 'rgba(192,132,252,0.5)'
@@ -1382,15 +1463,18 @@ export default function Hero() {
                       </div>
 
                       {/* Links */}
-                      {(project.demoUrl || project.sourceUrl) && (
-                        <div className="flex items-center gap-2 pt-2 border-t border-[rgba(192,132,252,0.08)]">
+                      {(project.demoUrl || project.sourceUrl) ? (
+                        <div
+                          className="flex items-center gap-2 pt-2 border-t border-[rgba(192,132,252,0.08)] mt-auto"
+                          style={{ minHeight: 32 }}
+                        >
                           {project.demoUrl && (
                             <a
                               href={project.demoUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center gap-1.5 text-[10px] tracking-widest uppercase no-underline transition-colors duration-300"
-                              style={{ color: ACCENT_PRIMARY }}
+                              style={{ color: ACCENT_PRIMARY, textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.color = ACCENT_SECONDARY
                               }}
@@ -1411,12 +1495,12 @@ export default function Hero() {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center gap-1.5 text-[10px] tracking-widest uppercase no-underline transition-colors duration-300"
-                              style={{ color: TEXT_MUTED }}
+                              style={{ color: '#c4b5fd', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.color = ACCENT_PRIMARY
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.color = TEXT_MUTED
+                                e.currentTarget.style.color = '#c4b5fd'
                               }}
                             >
                               <GithubSvg />
@@ -1424,6 +1508,8 @@ export default function Hero() {
                             </a>
                           )}
                         </div>
+                      ) : (
+                        <div style={{ minHeight: 32 }} className="mt-auto" />
                       )}
                     </motion.div>
                   ))}
