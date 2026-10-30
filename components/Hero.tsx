@@ -234,7 +234,8 @@ export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particleCanvasRef = useRef<HTMLCanvasElement>(null)
-  const framesRef = useRef<HTMLImageElement[]>([])
+  const frameDirRef = useRef<string>('/frames/v1/desktop')
+  const framesRef = useRef<(HTMLImageElement | null)[]>([])
   const currentRef = useRef(0)
   const targetRef = useRef(0)
   const rafRef = useRef<number | undefined>(undefined)
@@ -336,13 +337,28 @@ export default function Hero() {
     [0, 0,    0.5,  0.5,  0,    0,    0.55, 0.55, 0,    0,    0,    0.55, 0.55, 0,    0],
   )
 
-  /* ---- Draw frame (cover fit) ---- */
+  /* ---- Nearest loaded frame helper ---- */
+  const getNearestLoadedIndex = (target: number): number | null => {
+    const frames = framesRef.current
+    if (frames[target]?.complete && frames[target]?.naturalWidth) return target
+    for (let offset = 1; offset < TOTAL_FRAMES; offset++) {
+      const prev = target - offset
+      if (prev >= 0 && frames[prev]?.complete && frames[prev]?.naturalWidth) return prev
+      const next = target + offset
+      if (next < TOTAL_FRAMES && frames[next]?.complete && frames[next]?.naturalWidth) return next
+    }
+    return null
+  }
+
+  /* ---- Draw frame (cover fit with fallback to nearest loaded) ---- */
   const drawFrame = (index: number) => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    const img = framesRef.current[index]
+    const resolvedIndex = getNearestLoadedIndex(index)
+    if (resolvedIndex === null) return
+    const img = framesRef.current[resolvedIndex]
     if (!img || !img.complete || !img.naturalWidth) return
 
     const cw = canvas.width
@@ -389,6 +405,12 @@ export default function Hero() {
 
   /* ---- Preload frames + init particles ---- */
   useEffect(() => {
+    let cancelled = false
+
+    /* Choose set once at mount based on viewport width (<= 768px -> mobile) */
+    const isMobileDevice = window.innerWidth <= 768
+    frameDirRef.current = isMobileDevice ? '/frames/v1/mobile' : '/frames/v1/desktop'
+
     /* Init particles */
     particlesRef.current = Array.from({ length: 20 }, () => ({
       x: Math.random() * window.innerWidth,
@@ -400,26 +422,94 @@ export default function Hero() {
       vy: (Math.random() - 0.5) * 0.2,
     }))
 
-    /* Load frames */
-    const loadFrame = (i: number): Promise<void> =>
-      new Promise((resolve) => {
-        const img = new Image()
-        img.src = `/frames/frame_${String(i).padStart(4, '0')}.jpg`
-        img.onload = () => { framesRef.current[i - 1] = img; resolve() }
-        img.onerror = () => resolve()
-      })
+    const loadSingleFrame = async (idx: number): Promise<void> => {
+      if (cancelled || framesRef.current[idx]) return
+      const img = new Image()
+      img.src = `${frameDirRef.current}/frame_${String(idx + 1).padStart(4, '0')}.webp`
+      try {
+        await img.decode()
+      } catch {
+        // Fallback for decode error / abort
+      }
+      if (!cancelled) {
+        framesRef.current[idx] = img
+      }
+    }
 
     const init = async () => {
-      const first15 = Array.from({ length: 15 }, (_, i) => loadFrame(i + 1))
-      await Promise.all(first15)
+      // 1. Load and decode Frame 1 (poster) immediately
+      await loadSingleFrame(0)
+      if (cancelled) return
+
       resizeCanvases()
-      setLoaded(true)
-      for (let i = 16; i <= TOTAL_FRAMES; i++) loadFrame(i)
+      drawFrame(0)
+      setLoaded(true) // Unblocks hero text and animations immediately
+
+      // 2. Build progressive queue:
+      // Tier 1: every 8th frame (keyframes across whole scroll range)
+      // Tier 2: every 4th frame
+      // Tier 3: every 2nd frame
+      // Tier 4: all remaining frames
+      const queue: number[] = []
+      const added = new Set<number>([0])
+
+      // Tier 1: every 8th frame, plus the last frame (idx 95)
+      for (let i = 8; i < TOTAL_FRAMES; i += 8) {
+        if (!added.has(i)) { queue.push(i); added.add(i) }
+      }
+      if (!added.has(TOTAL_FRAMES - 1)) {
+        queue.push(TOTAL_FRAMES - 1)
+        added.add(TOTAL_FRAMES - 1)
+      }
+
+      // Tier 2: every 4th frame
+      for (let i = 4; i < TOTAL_FRAMES; i += 4) {
+        if (!added.has(i)) { queue.push(i); added.add(i) }
+      }
+
+      // Tier 3: every 2nd frame
+      for (let i = 2; i < TOTAL_FRAMES; i += 2) {
+        if (!added.has(i)) { queue.push(i); added.add(i) }
+      }
+
+      // Tier 4: the rest
+      for (let i = 1; i < TOTAL_FRAMES; i++) {
+        if (!added.has(i)) { queue.push(i); added.add(i) }
+      }
+
+      // 3. Process queue with 5 concurrent requests using idle time
+      const concurrency = 5
+      let queueIdx = 0
+
+      const processBatch = async () => {
+        if (cancelled || queueIdx >= queue.length) return
+        const batch = queue.slice(queueIdx, queueIdx + concurrency)
+        queueIdx += concurrency
+        await Promise.all(batch.map((idx) => loadSingleFrame(idx)))
+
+        if (!cancelled && queueIdx < queue.length) {
+          scheduleNext()
+        }
+      }
+
+      const scheduleNext = () => {
+        if (cancelled || queueIdx >= queue.length) return
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+          window.requestIdleCallback(() => processBatch(), { timeout: 300 })
+        } else {
+          setTimeout(processBatch, 16)
+        }
+      }
+
+      scheduleNext()
     }
 
     init()
     window.addEventListener('resize', resizeCanvases)
-    return () => window.removeEventListener('resize', resizeCanvases)
+    return () => {
+      cancelled = true
+      window.removeEventListener('resize', resizeCanvases)
+    }
   }, [])
 
   /* ---- rAF loop ---- */
@@ -628,18 +718,6 @@ export default function Hero() {
           className="fixed inset-0 z-[15] pointer-events-none"
           style={{ backgroundColor: 'black', opacity: overlayOpacity }}
         />
-
-        {/* ---- Loading ---- */}
-        {!loaded && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black">
-            <motion.div
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: ACCENT_PRIMARY }}
-              animate={{ opacity: [0.2, 1, 0.2] }}
-              transition={{ duration: 1.2, repeat: Infinity }}
-            />
-          </div>
-        )}
 
         {/* ---- Corner vignettes ---- */}
         {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((c) => (
