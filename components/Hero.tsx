@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useRef, useState, useMemo, Fragment, useSyncExternalStore } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import gsap from 'gsap'
 import {
@@ -28,6 +28,25 @@ const TEXT_MUTED = '#a78bfa'
 /*  Data                                                               */
 /* ------------------------------------------------------------------ */
 const TOTAL_FRAMES = 96
+
+const HERO_WORDS = [
+  { text: 'B.Tech', h: false }, { text: 'SE', h: false }, { text: 'student', h: false },
+  { text: 'at', h: false }, { text: 'Delhi', h: false }, { text: 'Technological', h: false },
+  { text: 'University.', h: false }, { text: 'I', h: false }, { text: 'build', h: false },
+  { text: 'operating', h: false }, { text: 'systems,', h: false },
+  { text: 'ML', h: false }, { text: 'pipelines', h: false }, { text: 'and', h: false },
+  { text: 'full-stack', h: false }, { text: 'products,', h: false },
+  { text: 'and', h: false }, { text: 'obsess', h: false }, { text: 'over', h: false },
+  { text: 'motion', h: false }, { text: 'and', h: false }, { text: 'UI.', h: false },
+  { text: 'I', h: false }, { text: 'write', h: false }, { text: 'code', h: false },
+  { text: 'the', h: false }, { text: 'way', h: false }, { text: 'others', h: false },
+  { text: 'listen', h: false }, { text: 'to', h: false }, { text: 'music,', h: false },
+  { text: 'on', h: true }, { text: 'repeat', h: true }, { text: 'until', h: true },
+  { text: "it's", h: true }, { text: 'right.', h: true },
+]
+const HERO_BIO_TEXT = HERO_WORDS.map((w) => w.text).join(' ')
+const HERO_TAGS = ['DTU', 'DELHI', 'OPEN TO WORK', 'SYSTEMS', 'ML', 'FULL STACK']
+const HERO_TAGS_TEXT = HERO_TAGS.join(' ')
 
 interface MomentData {
   label: string
@@ -226,6 +245,16 @@ const SKILL_CARD_CSS = `
 }
 `
 
+const subscribeWindowResize = (callback: () => void) => {
+  window.addEventListener('resize', callback)
+  return () => window.removeEventListener('resize', callback)
+}
+const subscribeNoop = () => () => {}
+const getWindowWidthSnapshot = () => (typeof window !== 'undefined' ? window.innerWidth : 1200)
+const getWindowWidthServerSnapshot = () => 1200
+const getMountedSnapshot = () => true
+const getMountedServerSnapshot = () => false
+
 /* ------------------------------------------------------------------ */
 /*  Hero Component                                                     */
 /* ------------------------------------------------------------------ */
@@ -246,8 +275,6 @@ export default function Hero() {
   const [loaded, setLoaded] = useState(false)
   const [momentIndex, setMomentIndex] = useState(0)
   const [showMoment, setShowMoment] = useState(true)
-  const [displayFrame, setDisplayFrame] = useState(1)
-  const [scrolled, setScrolled] = useState(false)
   const [hideHeroUI, setHideHeroUI] = useState(false)
   const [showSkills, setShowSkills] = useState(false)
   const [showLeetcode, setShowLeetcode] = useState(false)
@@ -256,15 +283,8 @@ export default function Hero() {
   const [lcStats, setLcStats] = useState<LeetCodeStats | null>(null)
 
   /* ---- Responsive ---- */
-  const [mounted, setMounted] = useState(false)
-  const [windowWidth, setWindowWidth] = useState(1200)
-  useEffect(() => {
-    setMounted(true)
-    setWindowWidth(window.innerWidth)
-    const handler = () => setWindowWidth(window.innerWidth)
-    window.addEventListener('resize', handler)
-    return () => window.removeEventListener('resize', handler)
-  }, [])
+  const mounted = useSyncExternalStore(subscribeNoop, getMountedSnapshot, getMountedServerSnapshot)
+  const windowWidth = useSyncExternalStore(subscribeWindowResize, getWindowWidthSnapshot, getWindowWidthServerSnapshot)
   const isMobile = mounted && windowWidth < 768
   const isTablet = mounted && windowWidth >= 768 && windowWidth < 1024
 
@@ -519,7 +539,6 @@ export default function Hero() {
       currentRef.current += (targetRef.current - currentRef.current) * 0.12
       const idx = Math.min(Math.round(currentRef.current), TOTAL_FRAMES - 1)
       drawFrame(idx)
-      setDisplayFrame(idx + 1)
       drawParticles()
       rafRef.current = requestAnimationFrame(tick)
     }
@@ -553,8 +572,7 @@ export default function Hero() {
       setShowProjects(v >= 0.74 && v < 0.89)
       setShowBio(v < 0.12)
 
-      /* Scroll hint + hero UI */
-      if (v > 0.05) setScrolled(true)
+      /* Hero UI hide */
       setHideHeroUI(v > 0.20)
     })
     return unsub
@@ -972,41 +990,34 @@ export default function Hero() {
               </motion.div>
 
               {/* Bio — word-by-word reveal */}
-              <div className="flex flex-wrap justify-center mb-8 mx-auto" style={{ gap: '0 12px', maxWidth: 560, fontSize: isMobile ? 'clamp(14px, 4vw, 18px)' : isTablet ? 'clamp(15px, 2.5vw, 20px)' : 'clamp(18px, 2.4vw, 24px)', lineHeight: 1.9 }}>
-                {[
-                  { text: 'B.Tech', h: false }, { text: 'SE', h: false }, { text: 'student', h: false },
-                  { text: 'at', h: false }, { text: 'Delhi', h: false }, { text: 'Technological', h: false },
-                  { text: 'University.', h: false }, { text: 'I', h: false }, { text: 'build', h: false },
-                  { text: 'operating', h: false }, { text: 'systems,', h: false },
-                  { text: 'ML', h: false }, { text: 'pipelines', h: false }, { text: 'and', h: false },
-                  { text: 'full-stack', h: false }, { text: 'products,', h: false },
-                  { text: 'and', h: false }, { text: 'obsess', h: false }, { text: 'over', h: false },
-                  { text: 'motion', h: false }, { text: 'and', h: false }, { text: 'UI.', h: false },
-                  { text: 'I', h: false }, { text: 'write', h: false }, { text: 'code', h: false },
-                  { text: 'the', h: false }, { text: 'way', h: false }, { text: 'others', h: false },
-                  { text: 'listen', h: false }, { text: 'to', h: false }, { text: 'music,', h: false },
-                  { text: 'on', h: true }, { text: 'repeat', h: true }, { text: 'until', h: true },
-                  { text: "it's", h: true }, { text: 'right.', h: true },
-                ].map((w, i) => (
-                  <motion.span
-                    key={i}
-                    style={{
-                      color: w.h ? '#e879f9' : '#ffffff',
-                      fontWeight: w.h ? 600 : 400,
-                      textShadow: '0 2px 10px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,0.9)',
-                    }}
-                    initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    transition={{
-                      duration: 0.5,
-                      ease: 'easeOut',
-                      delay: 0.8 + i * 0.04,
-                    }}
-                  >
-                    {w.text}
-                  </motion.span>
+              <p
+                className="flex flex-wrap justify-center mb-8 mx-auto"
+                style={{ gap: '0 12px', maxWidth: 560, fontSize: isMobile ? 'clamp(14px, 4vw, 18px)' : isTablet ? 'clamp(15px, 2.5vw, 20px)' : 'clamp(18px, 2.4vw, 24px)', lineHeight: 1.9 }}
+                aria-label={HERO_BIO_TEXT}
+              >
+                {HERO_WORDS.map((w, i) => (
+                  <Fragment key={i}>
+                    <motion.span
+                      aria-hidden="true"
+                      style={{
+                        color: w.h ? '#e879f9' : '#ffffff',
+                        fontWeight: w.h ? 600 : 400,
+                        textShadow: '0 2px 10px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,0.9)',
+                      }}
+                      initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                      transition={{
+                        duration: 0.5,
+                        ease: 'easeOut',
+                        delay: 0.8 + i * 0.04,
+                      }}
+                    >
+                      {w.text}
+                    </motion.span>
+                    {i < HERO_WORDS.length - 1 ? ' ' : null}
+                  </Fragment>
                 ))}
-              </div>
+              </p>
 
               {/* Line 5 — Tags */}
               <motion.div
@@ -1015,23 +1026,26 @@ export default function Hero() {
                 initial={{ opacity: 0, y: 16, filter: 'blur(14px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 0.8, ease: 'easeOut', delay: 0.85 }}
+                aria-label={HERO_TAGS_TEXT}
               >
-                {['DTU', 'DELHI', 'OPEN TO WORK', 'SYSTEMS', 'ML', 'FULL STACK'].map((tag) => (
-                  <span
-                    key={tag}
-                    className="tracking-widest uppercase inline-block whitespace-nowrap"
-                    style={{
-                      color: '#ffffff',
-                      border: '0.5px solid rgba(255,255,255,0.3)',
-                      borderRadius: 3,
-                      padding: isMobile ? '3px 8px' : '4px 12px',
-                      background: 'rgba(255,255,255,0.08)',
-                      fontSize: isMobile ? 8 : 9,
-                      textShadow: '0 1px 3px rgba(0,0,0,0.8)',
-                    }}
-                  >
-                    {tag}
-                  </span>
+                {HERO_TAGS.map((tag, i, arr) => (
+                  <Fragment key={tag}>
+                    <span
+                      className="tracking-widest uppercase inline-block whitespace-nowrap"
+                      style={{
+                        color: '#ffffff',
+                        border: '0.5px solid rgba(255,255,255,0.3)',
+                        borderRadius: 3,
+                        padding: isMobile ? '3px 8px' : '4px 12px',
+                        background: 'rgba(255,255,255,0.08)',
+                        fontSize: isMobile ? 8 : 9,
+                        textShadow: '0 1px 3px rgba(0,0,0,0.8)',
+                      }}
+                    >
+                      {tag}
+                    </span>
+                    {i < arr.length - 1 ? ' ' : null}
+                  </Fragment>
                 ))}
               </motion.div>
 
@@ -1517,25 +1531,27 @@ export default function Hero() {
 
                         {/* Tags */}
                         <div className="flex flex-wrap gap-1.5 mb-5">
-                          {project.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="text-[9px] rounded-sm px-2 py-0.5 tracking-widest uppercase cursor-default transition-all duration-300"
-                              style={{
-                                color: '#c4b5fd',
-                                border: '1px solid rgba(192,132,252,0.2)',
-                                background: 'rgba(192,132,252,0.04)',
-                                textShadow: '0 1px 2px rgba(0,0,0,0.8)',
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.borderColor = 'rgba(192,132,252,0.5)'
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.borderColor = 'rgba(192,132,252,0.2)'
-                              }}
-                            >
-                              {tag}
-                            </span>
+                          {project.tags.map((tag, tIdx) => (
+                            <Fragment key={tag}>
+                              <span
+                                className="text-[9px] rounded-sm px-2 py-0.5 tracking-widest uppercase cursor-default transition-all duration-300"
+                                style={{
+                                  color: '#c4b5fd',
+                                  border: '1px solid rgba(192,132,252,0.2)',
+                                  background: 'rgba(192,132,252,0.04)',
+                                  textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.borderColor = 'rgba(192,132,252,0.5)'
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.borderColor = 'rgba(192,132,252,0.2)'
+                                }}
+                              >
+                                {tag}
+                              </span>
+                              {tIdx < project.tags.length - 1 ? ' ' : null}
+                            </Fragment>
                           ))}
                         </div>
                       </div>
