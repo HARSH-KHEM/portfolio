@@ -1,5 +1,5 @@
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfolio-chi-coral-0x1jsxzplg.vercel.app";
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://harsh.is-a-dev.site";
+export const SITE_URL = rawSiteUrl.replace(/\/+$/, "");
 
 export const SITE_NAME = "Harsh Khem";
 

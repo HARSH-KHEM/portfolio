@@ -16,14 +16,14 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   alternates: {
-    canonical: "/",
+    canonical: `${SITE_URL}/`,
   },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
     title: "Harsh Khem | Software Engineer, Full-Stack and GenAI Developer",
     description: SITE_DESCRIPTION,
-    url: SITE_URL,
+    url: `${SITE_URL}/`,
     locale: "en_IN",
   },
   twitter: {
@@ -41,7 +41,7 @@ const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: SITE_NAME,
-  url: SITE_URL,
+  url: `${SITE_URL}/`,
   jobTitle: SITE_ROLE,
   alumniOf: {
     "@type": "EducationalOrganization",
